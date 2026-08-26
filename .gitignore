@@ -11,6 +11,7 @@ dist/
 
 # Artefatos de deploy
 .vercel
+supabase/.temp
 
 # Arquivos locais do Vite
 *.local

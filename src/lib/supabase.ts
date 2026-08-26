@@ -2,7 +2,6 @@ import { createClient } from '@supabase/supabase-js'
 
 const supabaseUrl = import.meta.env.VITE_SUPABASE_URL as string
 const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY as string
-const supabaseServiceKey = import.meta.env.VITE_SUPABASE_SERVICE_ROLE_KEY as string
 
 if (!supabaseUrl || !supabaseAnonKey) {
   console.warn(
@@ -22,15 +21,6 @@ export const supabase = createClient(
   }
 )
 
-// Cliente com service_role — bypassa RLS para operações administrativas
-// (atualizar cargo de outros usuários, criar/deletar perfis, etc.)
-export const supabaseAdmin = createClient(
-  supabaseUrl || 'https://placeholder.supabase.co',
-  supabaseServiceKey || supabaseAnonKey || 'placeholder-key',
-  {
-    auth: {
-      persistSession: false,
-      autoRefreshToken: false,
-    },
-  }
-)
+// Operações que exigem privilégio de service_role (ex: alterar cargo de outros
+// usuários) rodam em Supabase Edge Functions — a chave nunca chega ao navegador.
+// Ver: supabase/functions/update-user-cargo

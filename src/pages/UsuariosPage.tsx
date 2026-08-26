@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react'
 import { Users, Search, UserPlus } from 'lucide-react'
-import { supabase, supabaseAdmin } from '../lib/supabase'
+import { supabase } from '../lib/supabase'
 import { Profile, Cargo, CARGOS } from '../types'
 import { Layout } from '../components/layout/Layout'
 import { Card, CardHeader } from '../components/ui/Card'
@@ -35,10 +35,12 @@ export function UsuariosPage() {
 
   const updateCargo = async (p: Profile, newCargo: Cargo) => {
     if (p.id === currentProfile?.id) return
-    // Atualiza estado local imediatamente para evitar flickering causado por
-    // propagação entre cliente admin (service_role) e cliente anon no Supabase
+    // Atualiza estado local imediatamente para evitar flickering enquanto a
+    // Edge Function (que roda com service_role no servidor) processa o update
     setProfiles(prev => prev.map(u => u.id === p.id ? { ...u, cargo: newCargo } : u))
-    const { error } = await supabaseAdmin.from('profiles').update({ cargo: newCargo }).eq('id', p.id)
+    const { error } = await supabase.functions.invoke('update-user-cargo', {
+      body: { targetUserId: p.id, newCargo },
+    })
     if (error) {
       toastError('Erro ao atualizar cargo', error.message)
       // Reverte estado local se o update falhou

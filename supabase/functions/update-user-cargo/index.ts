@@ -28,8 +28,8 @@ Deno.serve(async (req) => {
   }
 
   const supabaseUrl = Deno.env.get('SUPABASE_URL')!
-  const anonKey = Deno.env.get('SUPABASE_ANON_KEY')!
-  const serviceKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!
+  const anonKey = Deno.env.get('SB_PUBLISHABLE_KEY')!
+  const serviceKey = Deno.env.get('SB_SECRET_KEY')!
 
   // Client no contexto do usuário que chamou — usado só para validar identidade e permissão.
   const callerClient = createClient(supabaseUrl, anonKey, {
